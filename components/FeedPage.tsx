@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PostCard } from './PostCard';
 import { GlassCard } from './GlassCard';
+import { CreatePostModal } from './CreatePostModal';
 import type { Layout, Post } from '../types';
 import { Plus, Filter, LayoutGrid, List, Flame } from 'lucide-react';
 // Fix: Import the Button component.
@@ -14,6 +15,7 @@ export const FeedPage: React.FC = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
 
   // Fetch posts from backend
   useEffect(() => {
@@ -34,6 +36,23 @@ export const FeedPage: React.FC = () => {
 
     fetchPosts();
   }, []);
+
+  const handlePostCreated = () => {
+    // Refresh posts after creating a new one
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/posts');
+        const data = await response.json();
+        setAllPosts(data.posts);
+        setVisiblePosts(data.posts.slice(0, 6));
+        setHasMore(data.posts.length > 6);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    fetchPosts();
+  };
 
   const loadMorePosts = () => {
     if (isLoadingMore || !hasMore) return;
@@ -79,6 +98,11 @@ export const FeedPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 pt-28 md:pt-32">
+      <CreatePostModal 
+        isOpen={isCreatePostModalOpen} 
+        onClose={() => setIsCreatePostModalOpen(false)}
+        onPostCreated={handlePostCreated}
+      />
       <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar */}
         <motion.aside 
@@ -152,6 +176,7 @@ export const FeedPage: React.FC = () => {
         className="fixed bottom-28 right-8 z-40 w-16 h-16 rounded-full bg-gradient-to-br from-[var(--aqua-gradient-start)] to-[var(--aqua-gradient-end)] text-white flex items-center justify-center shadow-lg transition-shadow duration-300"
         style={{ boxShadow: '0 0 20px var(--aqua-gradient-start)' }}
         data-magnetic
+        onClick={() => setIsCreatePostModalOpen(true)}
       >
         <Plus size={32} />
       </motion.button>

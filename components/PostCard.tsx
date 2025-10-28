@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import type { Post } from '../types';
 import { GlassCard } from './GlassCard';
 import { AnimatedCounter } from './AnimatedCounter';
 import { Twitter, Github, MessageCircle, ArrowUp, Share2, MessageSquare } from 'lucide-react';
+import { useWalletKit } from '@mysten/wallet-kit';
 
 const RedditIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
@@ -30,7 +31,34 @@ interface PostCardProps {
 
 export const PostCard: React.FC<PostCardProps> = ({ post, layout = 'grid' }) => {
   const isList = layout === 'list';
-  
+  const [upvotes, setUpvotes] = useState(post.stats.upvotes);
+  const [comments, setComments] = useState(post.stats.comments);
+  const { currentAccount } = useWalletKit();
+
+  const handleUpvote = async () => {
+    if (!currentAccount) {
+      alert('Please connect your wallet to upvote posts');
+      return;
+    }
+
+    try {
+      // Update on-chain using smart contract
+      // In a real implementation, you would call the smart contract function here
+      
+      // Update in backend
+      const response = await fetch(`http://localhost:5000/api/posts/${post.id}/upvote`, {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUpvotes(data.upvotes);
+      }
+    } catch (error) {
+      console.error('Error upvoting post:', error);
+    }
+  };
+
   const content = (
     <>
       {post.imageUrl && (
@@ -72,8 +100,16 @@ export const PostCard: React.FC<PostCardProps> = ({ post, layout = 'grid' }) => 
         
         <div className="border-t border-white/10 pt-4 flex items-center justify-between text-sm text-gray-400 dark:text-gray-500">
           <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1.5"><ArrowUp size={16} /> <AnimatedCounter value={post.stats.upvotes} /></div>
-              <div className="flex items-center gap-1.5"><MessageCircle size={16} /> <AnimatedCounter value={post.stats.comments} /></div>
+              <motion.button 
+                whileHover={{ scale: 1.1 }} 
+                whileTap={{ scale: 0.9 }} 
+                className="flex items-center gap-1.5 hover:text-[var(--primary-blue)] transition-colors"
+                data-magnetic
+                onClick={handleUpvote}
+              >
+                <ArrowUp size={16} /> <AnimatedCounter value={upvotes} />
+              </motion.button>
+              <div className="flex items-center gap-1.5"><MessageCircle size={16} /> <AnimatedCounter value={comments} /></div>
           </div>
           <div className="flex items-center gap-4">
             <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="flex items-center gap-1.5 hover:text-[var(--primary-blue)] transition-colors" data-magnetic>
