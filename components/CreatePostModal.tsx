@@ -46,7 +46,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Create post in backend
-      const response = await fetch('http://localhost:5000/api/posts', {
+      const response = await fetch('http://localhost:5001/api/posts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

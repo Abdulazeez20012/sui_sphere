@@ -35,12 +35,12 @@ export const ProfilePage: React.FC = () => {
       
       try {
         // Fetch user profile
-        const profileResponse = await fetch(`http://localhost:5000/api/user/${currentAccount.address}`);
+        const profileResponse = await fetch(`http://localhost:5001/api/user/${currentAccount.address}`);
         const profileData = await profileResponse.json();
         setUserProfile(profileData);
         
         // Fetch user posts
-        const postsResponse = await fetch(`http://localhost:5000/api/posts`);
+        const postsResponse = await fetch(`http://localhost:5001/api/posts`);
         const postsData = await postsResponse.json();
         setUserPosts(postsData.posts.filter((p: any) => p.authorAddress === currentAccount.address));
         

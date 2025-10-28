@@ -1,0 +1,276 @@
+{
+	"info": {
+		"_postman_id": "suisphere-api-collection",
+		"name": "SuiSphere API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Posts",
+			"item": [
+				{
+					"name": "Get All Posts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/posts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"source\": \"discussion\",\n  \"author\": \"0x1a2b3c4d5e6f7890\",\n  \"authorAddress\": \"0x1a2b3c4d5e6f7890\",\n  \"authorHandle\": \"@user123\",\n  \"avatarUrl\": \"https://picsum.photos/seed/user/48/48\",\n  \"title\": \"Test Post\",\n  \"content\": \"This is a test post created via API\",\n  \"tags\": [\"test\", \"api\"],\n  \"stats\": {\n    \"upvotes\": 0,\n    \"comments\": 0,\n    \"shares\": 0\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/posts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Post by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/posts/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "POST_ID_HERE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upvote Post",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/posts/:id/upvote",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								":id",
+								"upvote"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "POST_ID_HERE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Comment to Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"author\": \"0xabcdef1234567890\",\n  \"authorAddress\": \"0xabcdef1234567890\",\n  \"authorHandle\": \"@commenter\",\n  \"avatarUrl\": \"https://picsum.photos/seed/commenter/48/48\",\n  \"content\": \"This is a test comment\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/posts/:postId/comment",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								":postId",
+								"comment"
+							],
+							"variable": [
+								{
+									"key": "postId",
+									"value": "POST_ID_HERE"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "USER_WALLET_ADDRESS_HERE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create/Update User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"address\": \"0x1a2b3c4d5e6f7890\",\n  \"avatarUrl\": \"https://picsum.photos/seed/user/128/128\",\n  \"suiBalance\": 1337.42,\n  \"postIds\": [],\n  \"savedPostIds\": [],\n  \"badges\": []\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Save Post for User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"postId\": \"POST_ID_HERE\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/user/:userId/save",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								":userId",
+								"save"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "USER_WALLET_ADDRESS_HERE"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Feeds",
+			"item": [
+				{
+					"name": "Get Trending Feed",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/feed/trending",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"feed",
+								"trending"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sui Ecosystem Feed",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/feed/sui",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"feed",
+								"sui"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000/api"
+		}
+	]
+}

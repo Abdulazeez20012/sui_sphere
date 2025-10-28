@@ -8,18 +8,23 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "mongoose": "^7.5.0",
+    "axios": "^1.5.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "socket.io": "^4.7.2",
-    "axios": "^1.5.0",
-    "rate-limiter-flexible": "^2.4.1"
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "rate-limiter-flexible": "^2.4.1",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
   },
-  "keywords": ["sui", "web3", "forum", "blockchain"],
+  "keywords": [
+    "sui",
+    "web3",
+    "forum",
+    "blockchain"
+  ],
   "author": "SuiSphere Team",
   "license": "MIT"
 }

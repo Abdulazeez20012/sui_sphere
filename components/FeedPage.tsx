@@ -22,7 +22,7 @@ export const FeedPage: React.FC = () => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/api/posts');
+        const response = await fetch('http://localhost:5001/api/posts');
         const data = await response.json();
         setAllPosts(data.posts);
         setVisiblePosts(data.posts.slice(0, 6));
@@ -41,7 +41,7 @@ export const FeedPage: React.FC = () => {
     // Refresh posts after creating a new one
     const fetchPosts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/posts');
+        const response = await fetch('http://localhost:5001/api/posts');
         const data = await response.json();
         setAllPosts(data.posts);
         setVisiblePosts(data.posts.slice(0, 6));

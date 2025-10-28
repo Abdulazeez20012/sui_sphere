@@ -46,7 +46,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, layout = 'grid' }) => 
       // In a real implementation, you would call the smart contract function here
       
       // Update in backend
-      const response = await fetch(`http://localhost:5000/api/posts/${post.id}/upvote`, {
+      const response = await fetch(`http://localhost:5001/api/posts/${post.id}/upvote`, {
         method: 'POST',
       });
 

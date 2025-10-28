@@ -14,7 +14,7 @@ import { SettingsModal } from './components/SettingsModal';
 import { OnboardingModal } from './components/OnboardingModal';
 import { MagneticCursor } from './components/MagneticCursor';
 // Wallet integration imports
-import { WalletProvider } from '@mysten/wallet-kit';
+import { WalletKitProvider } from '@mysten/wallet-kit';
 import type { Theme, Page } from './types';
 
 const pageVariants = {
@@ -123,7 +123,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <WalletProvider>
+    <WalletKitProvider key="wallet-kit-provider">
       <div className="min-h-screen w-full overflow-x-hidden">
         <MagneticCursor />
         <AnimatePresence>
@@ -166,7 +166,7 @@ const App: React.FC = () => {
           )}
         </AnimatePresence>
       </div>
-    </WalletProvider>
+    </WalletKitProvider>
   );
 };
 
