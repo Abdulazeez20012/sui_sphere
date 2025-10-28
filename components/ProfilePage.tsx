@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { USER_PROFILE, POSTS, RECOMMENDATIONS } from '../constants';
 import { GlassCard } from './GlassCard';
 import { PostCard } from './PostCard';
 import { BadgeCard } from './BadgeCard';
 import { RecommendedCard } from './RecommendedCard';
 import { Copy, Droplets } from 'lucide-react';
+// Wallet integration
+import { useWalletKit } from '@mysten/wallet-kit';
 
 type ProfileTab = 'posts' | 'saved' | 'badges';
 
@@ -21,9 +22,40 @@ const itemVariants = {
 
 export const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ProfileTab>('posts');
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [userPosts, setUserPosts] = useState<any[]>([]);
+  const [savedPosts, setSavedPosts] = useState<any[]>([]);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const { currentAccount } = useWalletKit();
 
-  const userPosts = POSTS.filter(p => USER_PROFILE.postIds.includes(p.id));
-  const savedPosts = POSTS.filter(p => USER_PROFILE.savedPostIds.includes(p.id));
+  // Fetch user data from backend
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!currentAccount) return;
+      
+      try {
+        // Fetch user profile
+        const profileResponse = await fetch(`http://localhost:5000/api/user/${currentAccount.address}`);
+        const profileData = await profileResponse.json();
+        setUserProfile(profileData);
+        
+        // Fetch user posts
+        const postsResponse = await fetch(`http://localhost:5000/api/posts`);
+        const postsData = await postsResponse.json();
+        setUserPosts(postsData.posts.filter((p: any) => p.authorAddress === currentAccount.address));
+        
+        // Fetch saved posts
+        setSavedPosts(postsData.posts.filter((p: any) => profileData.savedPostIds?.includes(p._id)));
+        
+        // Fetch recommendations
+        setRecommendations(postsData.posts.slice(0, 4));
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+    
+    fetchUserData();
+  }, [currentAccount]);
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -50,7 +82,7 @@ export const ProfilePage: React.FC = () => {
       case 'badges':
         return (
           <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {USER_PROFILE.badges.map((badge) => (
+            {userProfile?.badges?.map((badge: any) => (
               <motion.div key={badge.id} variants={itemVariants}>
                 <BadgeCard badge={badge} />
               </motion.div>
@@ -79,12 +111,23 @@ export const ProfilePage: React.FC = () => {
     </button>
   );
 
+  if (!currentAccount) {
+    return (
+      <div className="container mx-auto px-4 pt-28 md:pt-32">
+        <GlassCard className="p-8 text-center">
+          <h2 className="font-heading text-2xl font-bold mb-4">Connect Your Wallet</h2>
+          <p className="mb-6">Please connect your Sui wallet to view your profile.</p>
+        </GlassCard>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 pt-28 md:pt-32">
       {/* Profile Header */}
       <GlassCard className="p-8 mb-12 flex flex-col md:flex-row items-center gap-8">
         <motion.img 
-            src={USER_PROFILE.avatarUrl} 
+            src={userProfile?.avatarUrl || 'https://picsum.photos/seed/user_profile/128/128'} 
             alt="User Avatar" 
             className="w-32 h-32 rounded-full border-4 border-[var(--primary-blue)] shadow-lg"
             initial={{ scale: 0.5, opacity: 0 }}
@@ -92,12 +135,14 @@ export const ProfilePage: React.FC = () => {
         />
         <div className="flex-grow text-center md:text-left">
           <div className="flex items-center justify-center md:justify-start gap-2">
-            <h1 className="font-heading text-3xl font-bold">{USER_PROFILE.address}</h1>
+            <h1 className="font-heading text-3xl font-bold">
+              {userProfile?.address?.substring(0, 6)}...{userProfile?.address?.substring(userProfile?.address?.length - 4)}
+            </h1>
             <button className="text-gray-400 hover:text-[var(--primary-blue)]"><Copy size={18} /></button>
           </div>
           <div className="mt-2 flex items-center justify-center md:justify-start gap-2 text-lg text-[var(--neon-teal)] font-semibold">
             <Droplets size={20} />
-            <span>{USER_PROFILE.suiBalance.toLocaleString()} SUI</span>
+            <span>{userProfile?.suiBalance?.toLocaleString() || 0} SUI</span>
           </div>
         </div>
       </GlassCard>
@@ -106,7 +151,7 @@ export const ProfilePage: React.FC = () => {
       <div className="mb-8 border-b border-white/10 flex justify-center md:justify-start">
         <TabButton tab="posts" label={`Posts (${userPosts.length})`} />
         <TabButton tab="saved" label={`Saved (${savedPosts.length})`} />
-        <TabButton tab="badges" label={`Badges (${USER_PROFILE.badges.length})`} />
+        <TabButton tab="badges" label={`Badges (${userProfile?.badges?.length || 0})`} />
       </div>
 
       {/* Tab Content */}
@@ -140,7 +185,7 @@ export const ProfilePage: React.FC = () => {
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
               variants={containerVariants}
           >
-              {RECOMMENDATIONS.map((item) => (
+              {recommendations.map((item) => (
                   <motion.div key={item.id} variants={itemVariants}>
                       <RecommendedCard item={item} />
                   </motion.div>

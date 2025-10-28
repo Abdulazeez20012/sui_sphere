@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Navbar } from './components/Navbar';
@@ -14,6 +13,8 @@ import { ChatBubble } from './components/ChatBubble';
 import { SettingsModal } from './components/SettingsModal';
 import { OnboardingModal } from './components/OnboardingModal';
 import { MagneticCursor } from './components/MagneticCursor';
+// Wallet integration imports
+import { WalletProvider } from '@mysten/wallet-kit';
 import type { Theme, Page } from './types';
 
 const pageVariants = {
@@ -122,48 +123,50 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden">
-      <MagneticCursor />
-      <AnimatePresence>
-        {showOnboarding && <OnboardingModal onComplete={handleOnboardingComplete} />}
-      </AnimatePresence>
-      <ScrollProgressBar />
-      <BackgroundOrbs />
-      <Navbar 
-        onNavigate={navigateTo} 
-        currentTheme={theme} 
-        toggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-        isSoundOn={isSoundOn}
-        toggleSound={toggleSound}
-        onToggleSettings={toggleSettingsModal}
-      />
-      <main>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentPage}
-            initial="initial"
-            animate="in"
-            exit="out"
-            variants={pageVariants}
-            transition={pageTransition}
-          >
-            {renderPage()}
-          </motion.div>
+    <WalletProvider>
+      <div className="min-h-screen w-full overflow-x-hidden">
+        <MagneticCursor />
+        <AnimatePresence>
+          {showOnboarding && <OnboardingModal onComplete={handleOnboardingComplete} />}
         </AnimatePresence>
-      </main>
-      <Footer />
-      <ChatBubble />
-      <audio ref={audioRef} src={ambientSoundData} loop />
-      <AnimatePresence>
-        {isSettingsOpen && (
-          <SettingsModal 
-            onClose={toggleSettingsModal} 
-            isSoundOn={isSoundOn}
-            toggleSound={toggleSound}
-          />
-        )}
-      </AnimatePresence>
-    </div>
+        <ScrollProgressBar />
+        <BackgroundOrbs />
+        <Navbar 
+          onNavigate={navigateTo} 
+          currentTheme={theme} 
+          toggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          isSoundOn={isSoundOn}
+          toggleSound={toggleSound}
+          onToggleSettings={toggleSettingsModal}
+        />
+        <main>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentPage}
+              initial="initial"
+              animate="in"
+              exit="out"
+              variants={pageVariants}
+              transition={pageTransition}
+            >
+              {renderPage()}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+        <Footer />
+        <ChatBubble />
+        <audio ref={audioRef} src={ambientSoundData} loop />
+        <AnimatePresence>
+          {isSettingsOpen && (
+            <SettingsModal 
+              onClose={toggleSettingsModal} 
+              isSoundOn={isSoundOn}
+              toggleSound={toggleSound}
+            />
+          )}
+        </AnimatePresence>
+      </div>
+    </WalletProvider>
   );
 };
 

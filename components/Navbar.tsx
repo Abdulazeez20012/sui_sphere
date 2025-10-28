@@ -3,6 +3,9 @@ import type { Page, Theme } from '../types';
 import { Waves, Search, Settings } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { SoundToggle } from './SoundToggle';
+// Wallet integration
+import { useWalletKit } from '@mysten/wallet-kit';
+import { WalletKitButton } from '@mysten/wallet-kit';
 
 interface NavbarProps {
   onNavigate: (page: Page) => void;
@@ -15,6 +18,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentTheme, toggleTheme, isSoundOn, toggleSound, onToggleSettings }) => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { currentAccount } = useWalletKit();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,6 +53,27 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentTheme, toggle
           </div>
           <SoundToggle isSoundOn={isSoundOn} onToggle={toggleSound} />
           <ThemeToggle theme={currentTheme} onToggle={toggleTheme} />
+          {/* Wallet Connection Button */}
+          <div className="flex items-center">
+            {currentAccount ? (
+              <div className="flex items-center gap-2 bg-white/10 rounded-full px-3 py-1">
+                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                <span className="text-sm">
+                  {currentAccount.address.substring(0, 6)}...{currentAccount.address.substring(currentAccount.address.length - 4)}
+                </span>
+              </div>
+            ) : (
+              <WalletKitButton style={{ 
+                background: 'var(--primary-blue)', 
+                color: 'white', 
+                border: 'none', 
+                padding: '8px 16px', 
+                borderRadius: '8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }} />
+            )}
+          </div>
           <button
             onClick={onToggleSettings}
             className="relative w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary-blue)]"

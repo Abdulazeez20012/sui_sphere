@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@google/genai": "^1.27.0",
+    "@mysten/sui.js": "^0.54.1",
+    "@mysten/wallet-kit": "^0.8.6",
+    "@mysten/zklogin": "^0.8.1",
     "framer-motion": "^11.3.19",
     "lottie-web": "^5.12.2",
     "lucide-react": "^0.548.0",

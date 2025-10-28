@@ -1,28 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { POSTS } from '../constants';
 import { PostCard } from './PostCard';
 import { GlassCard } from './GlassCard';
-import type { Layout } from '../types';
+import type { Layout, Post } from '../types';
 import { Plus, Filter, LayoutGrid, List, Flame } from 'lucide-react';
 // Fix: Import the Button component.
 import { Button } from './Button';
 
 export const FeedPage: React.FC = () => {
   const [layout, setLayout] = useState<Layout>('grid');
-  const [visiblePosts, setVisiblePosts] = useState(POSTS.slice(0, 6));
+  const [visiblePosts, setVisiblePosts] = useState<Post[]>([]);
+  const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(POSTS.length > 6);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch posts from backend
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:5000/api/posts');
+        const data = await response.json();
+        setAllPosts(data.posts);
+        setVisiblePosts(data.posts.slice(0, 6));
+        setHasMore(data.posts.length > 6);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   const loadMorePosts = () => {
     if (isLoadingMore || !hasMore) return;
     setIsLoadingMore(true);
     setTimeout(() => {
       const currentLength = visiblePosts.length;
-      const newPosts = POSTS.slice(currentLength, currentLength + 3);
+      const newPosts = allPosts.slice(currentLength, currentLength + 3);
       setVisiblePosts(prevPosts => [...prevPosts, ...newPosts]);
       setIsLoadingMore(false);
-      if (currentLength + 3 >= POSTS.length) {
+      if (currentLength + 3 >= allPosts.length) {
         setHasMore(false);
       }
     }, 1000);
@@ -45,6 +66,16 @@ export const FeedPage: React.FC = () => {
       opacity: 1,
     },
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 pt-28 md:pt-32">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--primary-blue)]"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 pt-28 md:pt-32">
